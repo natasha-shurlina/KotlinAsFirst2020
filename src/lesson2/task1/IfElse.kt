@@ -5,6 +5,7 @@ package lesson2.task1
 import lesson1.task1.discriminant
 import lesson1.task1.sqr
 import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -71,7 +72,15 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    return when {
+        age % 100 == 11 -> "$age лет"
+        age % 10 == 1 -> "$age год"
+        age / 10 % 10 == 1 -> "$age лет"
+        age / 10 % 10 == 9 -> "$age лет"
+        else -> "$age года"
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -84,7 +93,14 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    val halfS = ((t1 * v1 + t2 * v2 + t3 * v3) / 2)
+    return when {
+        halfS <= (t1 * v1) -> halfS / v1
+        halfS <= (t1 * v1 + t2 * v2) -> t1 + (halfS - t1 * v1) / v2
+        else -> t1 + t2 + (halfS - t1 * v1 - t2 * v2) / v3
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -99,7 +115,13 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int = when {
+    kingX == rookX1 || kingY == rookY1 && kingX == rookX2 || kingY == rookY2 -> 3
+    kingX == rookX1 || kingY == rookY1 -> 1
+    kingX == rookX2 || kingY == rookY2 -> 2
+    else -> 0
+}
+
 /**
  * Простая (2 балла)
  *
@@ -124,7 +146,17 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val st = maxOf(a, b, c)
+    val vt = minOf(a, b, c)
+    val zt = (a + b + c) - st - vt
+    return if (vt + zt > st) when {
+        sqr(st) == sqr(vt) + sqr(zt) -> 1
+        sqr(st) > sqr(vt) + sqr(zt) -> 2
+        else -> 0
+    }
+    else -1
+}
 
 /**
  * Средняя (3 балла)
@@ -134,4 +166,12 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int) = when {
+    (a in c..d) && (d in a..b) -> d - a
+    (c in a..b) && (b in c..d) -> b - c
+    (c in a..d) && (d in c..b) -> d - c
+    (a in c..b) && (b in a..d) -> b - a
+    else -> -1
+}
+
+
