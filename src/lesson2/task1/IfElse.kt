@@ -73,12 +73,13 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    return when {
-        age % 100 == 11 -> "$age лет"
-        age % 10 == 1 -> "$age год"
-        age / 10 % 10 == 1 -> "$age лет"
-        age / 10 % 10 == 9 -> "$age лет"
-        else -> "$age года"
+    if (age % 100 in 11..19) {
+        return "$age лет"
+    }
+    return when (age % 10) {
+        1 -> "$age год"
+        2, 3, 4, -> "$age года"
+        else -> "$age лет"
     }
 }
 
@@ -115,12 +116,7 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = when {
-    kingX == rookX1 || kingY == rookY1 && kingX == rookX2 || kingY == rookY2 -> 3
-    kingX == rookX1 || kingY == rookY1 -> 1
-    kingX == rookX2 || kingY == rookY2 -> 2
-    else -> 0
-}
+): Int = TODO()
 
 /**
  * Простая (2 балла)
