@@ -146,12 +146,12 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
     val st = maxOf(a, b, c)
     val vt = minOf(a, b, c)
     val zt = (a + b + c) - st - vt
-    return if (vt + zt > st) when {
-        sqr(st) == sqr(vt) + sqr(zt) -> 1
-        sqr(st) > sqr(vt) + sqr(zt) -> 2
+    return when {
+        (vt + zt > st) && (sqr(st) == sqr(vt) + sqr(zt)) -> 1
+        (vt + zt > st) && (sqr(st) > sqr(vt) + sqr(zt)) -> 2
+        (vt + zt < st) -> -1
         else -> 0
     }
-    else -1
 }
 
 /**
@@ -162,12 +162,14 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int) = when {
-    (a in c..d) && (d in a..b) -> d - a
-    (c in a..b) && (b in c..d) -> b - c
-    (c in a..d) && (d in c..b) -> d - c
-    (a in c..b) && (b in a..d) -> b - a
-    else -> -1
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    val max = maxOf(a, c)
+    val min = minOf(b, d)
+    return when {
+        d >= a && b >= c -> abs (max - min)
+        else -> -1
+    }
+
 }
 
 
