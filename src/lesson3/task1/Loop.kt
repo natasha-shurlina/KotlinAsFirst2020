@@ -2,7 +2,6 @@
 
 package lesson3.task1
 
-import kotlinx.html.InputType
 import lesson1.task1.sqr
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -76,15 +75,16 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    if (n == 0) return 1 else {
-        var count = 0
-        var number = Math.abs(n)
-        while (number > 0) {
-            count++
-            number /= 10
-        }
-        return count
+    if (n == 0) {
+        return 1
     }
+    var count = 0
+    var number = kotlin.math.abs(n)
+    while (number > 0) {
+        count++
+        number /= 10
+    }
+    return count
 }
 
 /**
@@ -111,11 +111,14 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var number = 2
-    while (n % number != 0) {
-        number += 1
+    var m = 1
+    for (i in 2..sqrt(n.toDouble()).toInt()) {
+        if (n % i == 0) m = i
+        if (m > 1) break
     }
-    return number
+    if (m == 1) return n
+    return m
+
 }
 
 /**
@@ -179,7 +182,7 @@ fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
 fun revert(n: Int): Int {
     var result = 0
     var number = n
-    while (number > 0.0) {
+    while (number > 0) {
         result = (result * 10 + number % 10)
         number /= 10
     }
