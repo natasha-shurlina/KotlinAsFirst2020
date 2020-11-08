@@ -143,9 +143,7 @@ fun mean(list: List<Double>): Double {
         sum += element
         count++
     }
-    return if (sum == 0.0) 0.0 else {
-        sum / count
-    }
+    return if (sum == 0.0) 0.0 else sum / count
 }
 
 /**
@@ -195,6 +193,7 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
     }
     return list
 }
+
 /**
  * Средняя (3 балла)
  *
@@ -239,18 +238,18 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     val result = mutableListOf<Int>()
     var number = n
-    if (n < base) result.add(n)
+    if (number == 0) result.add(0)
     else {
-        while (number / base >= base) {
+        while (number != 0) {
             result.add(0, number % base)
             number /= base
         }
-        result.add(0, number % base)
-        result.add(0, number / base)
     }
     return result
 }
 
+//if (n < base) result.add(n)
+// else {
 /**
  * Сложная (4 балла)
  *
@@ -293,9 +292,26 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * Перевести натуральное число n > 0 в римскую систему.
  * Римские цифры: 1 = I, 4 = IV, 5 = V, 9 = IX, 10 = X, 40 = XL, 50 = L,
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
- * Например: 23 = XXIII, 44 = XLIV, 100 = C
+ * Например: 23 = XXIII, 445 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+/**
+ */
+fun roman(n: Int): String {
+    var result = ""
+    var number = n
+    val romanNumber = listOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
+    val arabNumber = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    for (i in romanNumber.indices) {
+        if (number / arabNumber[i] > 0) {
+            while (number / arabNumber[i] != 0) {
+                result += romanNumber[i]
+                number -= arabNumber[i]
+            }
+        } else continue
+    }
+    return result
+}
+
 
 /**
  * Очень сложная (7 баллов)
@@ -304,4 +320,6 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+
+}
