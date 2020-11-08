@@ -5,6 +5,7 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import lesson1.task1.sqr
+import lesson6.task1.dateStrToDigit
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -320,6 +321,4 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String {
-
-}
+fun russian(n: Int): String = TODO()
