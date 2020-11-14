@@ -239,18 +239,13 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     val result = mutableListOf<Int>()
     var number = n
-    if (number == 0) result.add(0)
-    else {
-        while (number != 0) {
-            result.add(0, number % base)
-            number /= base
-        }
-    }
+    do {
+        result.add(0, number % base)
+        number /= base
+    } while (number != 0)
     return result
 }
 
-//if (n < base) result.add(n)
-// else {
 /**
  * Сложная (4 балла)
  *
@@ -303,12 +298,10 @@ fun roman(n: Int): String {
     val romanNumber = listOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
     val arabNumber = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
     for (i in romanNumber.indices) {
-        if (number / arabNumber[i] > 0) {
-            while (number / arabNumber[i] != 0) {
-                result += romanNumber[i]
-                number -= arabNumber[i]
-            }
-        } else continue
+        while (number / arabNumber[i] != 0) {
+            result += romanNumber[i]
+            number -= arabNumber[i]
+        }
     }
     return result
 }
