@@ -2,6 +2,8 @@
 
 package lesson5.task1
 
+import ru.spbstu.wheels.sorted
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -124,9 +126,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *   subtractOf(a = mutableMapOf("a" to "z"), mapOf("a" to "z"))
  *     -> a changes to mutableMapOf() aka becomes empty
  */
-fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
-    TODO()
-}
+fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMap<String, String> = TODO()
 
 /**
  * Простая (2 балла)
@@ -208,7 +208,14 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+fun extractRepeats(list: List<String>): Map<String, Int> {
+    val repeat = mutableMapOf<String, Int>()
+    for (element in list) {
+        repeat[element] = (repeat[element] ?: 0) + 1
+
+    }
+    return repeat.filter { it.value > 1 }
+}
 
 /**
  * Средняя (3 балла)
@@ -277,7 +284,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    val map = mutableMapOf<Int, Int>()
+    for ((i, n) in list.withIndex()) {
+        if (map.containsKey(number - list[i])) return Pair(map[number - list[i]]!!, i).sorted()
+        map[n] = i
+    }
+    return Pair(-1, -1)
+}
 
 /**
  * Очень сложная (8 баллов)
