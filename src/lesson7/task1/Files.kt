@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -63,7 +64,15 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    File(inputName).forEachLine { line ->
+        if (line.startsWith("_")) return@forEachLine
+        else {
+            writer.write(line)
+            writer.newLine()
+        }
+    }
+    writer.close()
 }
 
 /**
@@ -99,7 +108,7 @@ fun sibilants(inputName: String, outputName: String) {
         .replace(Regex("""(?<=[ЖжЧчШшЩщ])Я"""), "А")
         .replace(Regex("""(?<=[ЖжЧчШшЩщ])ю"""), "у")
         .replace(Regex("""(?<=[ЖжЧчШшЩщ])Ю"""), "У")
-    File(outputName).bufferedWriter().use { it.write(correction)}
+    File(outputName).bufferedWriter().use { it.write(correction) }
 }
 
 /**
@@ -120,7 +129,17 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    var maxLineLength = 0
+    File(inputName).forEachLine { line ->
+        if (line.trim().length > maxLineLength) maxLineLength = line.trim().length
+    }
+    fun centered(a: String, b: Int): String = " ".repeat((b - a.length) / 2) + a
+    File(inputName).forEachLine { line ->
+        writer.write(centered(line.trim(), maxLineLength))
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**
@@ -151,8 +170,40 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    var maxLineLength = 0
+    File(inputName).forEachLine { line ->
+        while (line.trim().contains("  ")) line.replace("  ", " ")
+        if (line.trim().length > maxLineLength) maxLineLength = line.trim().length
+    }
+    File(inputName).forEachLine { line ->
+        var result = StringBuilder(line.trim())
+        val word = result.toString().split(" ")
+        if ((line.trim().length == maxLineLength) || (word.size == 1)) writer.write(line.trim())
+        else {
+            result = StringBuilder(word.joinToString(" "))
+            var n = 0
+            var ind = word[n].length
+            var repetitiveSpaces = 0
+            var countSpaces = 0
+            while (result.length != maxLineLength) {
+                result.insert(ind, " ")
+                countSpaces++
+                n++
+                ind += word[n].length + repetitiveSpaces + 2
+                if (countSpaces % (word.size - 1) == 0) {
+                    n = 0
+                    repetitiveSpaces++
+                    ind = word[n].length
+                }
+            }
+            writer.write(result.toString())
+        }
+        writer.newLine()
+    }
+    writer.close()
 }
+
 
 /**
  * Средняя (14 баллов)
