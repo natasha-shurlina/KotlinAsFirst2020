@@ -116,7 +116,19 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int {
+    val threat1 = kingX == rookX1
+    val threat12 = kingY == rookY1
+    val threat2 = kingX == rookX2
+    val threat21 = kingY == rookY2
+    return when {
+        (threat1 || threat12) && (threat2 || threat21) -> 3
+        threat1 || threat12 -> 1
+        threat2 || threat21 -> 2
+        else -> 0
+    }
+
+}
 
 /**
  * Простая (2 балла)
@@ -166,7 +178,7 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     val max = maxOf(a, c)
     val min = minOf(b, d)
     return when {
-        d >= a && b >= c -> abs (max - min)
+        d >= a && b >= c -> abs(max - min)
         else -> -1
     }
 
