@@ -101,14 +101,19 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    val correction = File(inputName).readText()
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])ы"""), "и")
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])Ы"""), "И")
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])я"""), "а")
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])Я"""), "А")
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])ю"""), "у")
-        .replace(Regex("""(?<=[ЖжЧчШшЩщ])Ю"""), "У")
-    File(outputName).bufferedWriter().use { it.write(correction) }
+    val correction = mapOf('ы' to 'и', 'я' to 'а', 'ю' to 'у', 'Ы' to 'И', 'Я' to 'А', 'Ю' to 'У')
+    val letters = setOf('ж', 'ч', 'ш', 'щ', 'Ж', 'Ч', 'Ш', 'Щ')
+    val writer = File(outputName).bufferedWriter()
+    File(inputName).forEachLine {
+        val lineWritten = StringBuilder(it)
+        for (i in it.indices) {
+            if ((it[i].toLowerCase() in letters) && (it[i + 1] in correction))
+                lineWritten[i + 1] = correction[it[i + 1]] ?: error("")
+        }
+        writer.write(lineWritten.toString())
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**
