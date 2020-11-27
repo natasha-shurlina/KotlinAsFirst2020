@@ -172,8 +172,8 @@ fun centerFile(inputName: String, outputName: String) {
 fun alignFileByWidth(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     val reader = File(inputName).bufferedReader()
-    val lines = reader.readLines().toMutableList()
     var maxLineLength = 0
+    val lines = reader.readLines().toMutableList()
     lines.forEach {
         while (it.trim().contains("  ")) it.replace("  ", " ")
         if (it.trim().length > maxLineLength) maxLineLength = it.trim().length
