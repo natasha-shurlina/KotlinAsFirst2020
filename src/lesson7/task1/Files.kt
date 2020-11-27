@@ -172,36 +172,35 @@ fun centerFile(inputName: String, outputName: String) {
 fun alignFileByWidth(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     var maxLineLength = 0
-    File(inputName).forEachLine { line ->
-        while (line.trim().contains("  ")) line.replace("  ", " ")
-        if (line.trim().length > maxLineLength) maxLineLength = line.trim().length
+    File(inputName).forEachLine {
+        if (it.trim().length > maxLineLength) maxLineLength = it.trim().length
     }
-    for (line in File(inputName).readLines()) {
+    File(inputName).forEachLine { line ->
         var result = StringBuilder(line.trim())
         val word = result.toString().split(" ")
         if (word.size == 1) {
             writer.write(word[0])
             writer.newLine()
-        } else {
-            result = StringBuilder(word.joinToString(" "))
-            var n = 0
-            var ind = word[n].length
-            var repetitiveSpaces = 0
-            var countSpaces = 0
-            while (result.length != maxLineLength) {
-                result.insert(ind, " ")
-                countSpaces++
-                n++
-                ind += word[n].length + repetitiveSpaces + 2
-                if (countSpaces % (word.size - 1) == 0) {
-                    n = 0
-                    repetitiveSpaces++
-                    ind = word[n].length
-                }
-            }
-            writer.write(result.toString())
-            writer.newLine()
+            return@forEachLine
         }
+        result = StringBuilder(word.joinToString(" "))
+        var n = 0
+        var ind = word[n].length
+        var repetitiveSpaces = 0
+        var countSpaces = 0
+        while (result.length != maxLineLength) {
+            result.insert(ind, " ")
+            countSpaces++
+            n++
+            ind += word[n].length + repetitiveSpaces + 2
+            if (countSpaces % (word.size - 1) == 0) {
+                n = 0
+                repetitiveSpaces++
+                ind = word[n].length
+            }
+        }
+        writer.write(result.toString())
+        writer.newLine()
     }
     writer.close()
 }
