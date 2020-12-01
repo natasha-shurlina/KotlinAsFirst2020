@@ -106,7 +106,7 @@ fun sibilants(inputName: String, outputName: String) {
     val letters = setOf('ж', 'ч', 'ш', 'щ', 'Ж', 'Ч', 'Ш', 'Щ')
     File(inputName).forEachLine {
         val lineWritten = StringBuilder(it)
-        for (i in it.indices - 1) {
+        for (i in 0 until it.length - 1) {
             if ((it[i] in letters) && (it[i + 1] in correction))
                 lineWritten[i + 1] = correction[it[i + 1]]!!
         }
