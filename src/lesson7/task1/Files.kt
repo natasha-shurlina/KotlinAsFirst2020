@@ -107,7 +107,7 @@ fun sibilants(inputName: String, outputName: String) {
     File(inputName).forEachLine {
         val lineWritten = StringBuilder(it)
         for (i in it.indices - 1) {
-            if ((it[i].toLowerCase() in letters) && (it[i + 1] in correction))
+            if ((it[i] in letters) && (it[i + 1] in correction))
                 lineWritten[i + 1] = correction[it[i + 1]] ?: error("")
         }
         writer.write(lineWritten.toString())
@@ -178,11 +178,8 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     var maxLineLength = 0
     File(inputName).bufferedReader().forEachLine {
-        it.trim()
-        while (it.contains("  ")) {
-            it.replace(Regex("""\\s+"""), " ")
-        }
-        if (it.length > maxLineLength) maxLineLength = it.length
+        it.trim().replace(Regex("""\\s+"""), " ")
+        if (it.trim().length > maxLineLength) maxLineLength = it.trim().length
     }
     File(inputName).forEachLine { line ->
         var result = StringBuilder(line.trim())
