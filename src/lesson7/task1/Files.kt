@@ -108,13 +108,14 @@ fun sibilants(inputName: String, outputName: String) {
         val lineWritten = StringBuilder(it)
         for (i in it.indices - 1) {
             if ((it[i] in letters) && (it[i + 1] in correction))
-                lineWritten[i + 1] = correction[it[i + 1]] ?: error("")
+                lineWritten[i + 1] = correction[it[i + 1]]!!
         }
         writer.write(lineWritten.toString())
         writer.newLine()
     }
     writer.close()
 }
+
 
 /**
  * Средняя (15 баллов)
@@ -177,13 +178,18 @@ fun centerFile(inputName: String, outputName: String) {
 fun alignFileByWidth(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     var maxLineLength = 0
-    File(inputName).bufferedReader().forEachLine {
-        it.trim().replace(Regex("""\\s+"""), " ")
-        if (it.trim().length > maxLineLength) maxLineLength = it.trim().length
+    File(inputName).forEachLine {
+        var lengthLine = 0
+        val withoutExtraSpaces = it.trim().split(Regex("""\s+"""))
+        for (el in withoutExtraSpaces.indices) {
+            lengthLine += withoutExtraSpaces[el].length + 1
+        }
+        lengthLine--
+        if (lengthLine > maxLineLength) maxLineLength = lengthLine
     }
     File(inputName).forEachLine { line ->
         var result = StringBuilder(line.trim())
-        val word = result.toString().split(" ")
+        val word = result.toString().split(Regex("""\s+"""))
         if (word.size == 1) {
             writer.write(word[0])
             writer.newLine()
