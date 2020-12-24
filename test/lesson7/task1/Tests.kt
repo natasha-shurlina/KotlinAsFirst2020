@@ -1,5 +1,6 @@
 package lesson7.task1
 
+import lesson6.task1.timeStrToSeconds
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -441,4 +442,12 @@ Basic, Ruby, Swift.
 
         File("temp.txt").delete()
     }
+
+    @Test
+    fun main() {
+        assertEquals(null, main("input/testMap.txt"))
+        assertEquals("5 - 11;", main("input/Second.txt"))
+        assertEquals("7 - 10;", main("input/Third.txt"))
+    }
+
 }

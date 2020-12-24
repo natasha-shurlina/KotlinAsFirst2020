@@ -2,7 +2,10 @@
 
 package lesson7.task1
 
+import kotlinx.html.attributes.stringSetDecode
+import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
 import java.io.File
+import kotlin.collections.ArrayList
 import kotlin.math.max
 
 // Урок 7: работа с файлами
@@ -523,3 +526,198 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     TODO()
 }
 
+/**Есть файл, в котором схематично изображено поле для игры в крестики-нолики на доске 15х15, а именно:
+- 15 строк
+- в каждой строке строго 15 символов
+- пустая клетка обозначается -, крестик х, нолик о
+
+Функция, которую нужно написать, принимает как параметры имя этого файла и очередность хода
+(крестики или нолики).
+Необходимо определить, существует ли ход, приводящий эту сторону к победе
+(для этого нужно составить 5 своих знаков в ряд по вертикали, горизонтали или диагонали).
+Если он не существует, следует вернуть null,
+если существует — координаты клетки, куда нужно сходить.
+
+Необходимо написать функцию и тесты к ней.
+ */
+enum class Player(val value: Char) {
+    X('X'), O('O'), VOID('-'), EMPTY(' ')
+}
+
+fun main(inputName: String): Any? {
+    val size = 15 // размер квадратного поля
+    val winnerQuality = 5 // условие победы
+    val map: ArrayList<Array<Pair<Pair<Int, Int>, Char>>> = ArrayList()
+
+
+    // инициализация map для избежания ошибки NullPointerException
+    for (i in 0 until size) {
+        map.add(Array(size) { Pair(Pair(0, 0), Player.EMPTY.value) })
+    }
+
+    for (i in map.indices) {
+        for (j in map.indices) {
+            map[i][j] = Pair(Pair(i, j), Player.VOID.value)
+        }
+    }
+
+
+    // читаем данные и сохраняем в map
+    var k = 0
+    File(inputName).forEachLine { line ->
+        val values = line.split(' ')
+        for (i in values.indices) {
+            map[k][i] = Pair(Pair(k, i), values[i][0])
+        }
+        k++
+    }
+
+    val player = Player.X.value    // игрок
+    val enemy = Player.O.value     // противник
+
+    // проверяем, не победил ли уже противник
+    val winningMoveEnemy = mutableListOf<String>()  // выигрышный ход противника
+    var resultEnemy: ArrayList<Pair<Pair<Int, Int>, Char>>? = null   // нашлись ходы, куда можно сходить
+
+    // Смотрим на то, сколько значений имеется в ряд у противника
+    for (i in winnerQuality downTo 0) {
+        if (resultEnemy != null) break
+        for (j in 0..4) {
+            if (resultEnemy == null) resultEnemy = map.onTransportation(j).toSquares().checkDiagonal(i, enemy, player)
+            // переворачиваем map на 90 градусов j раз (ищем по горизонтали и вертикали), разбиваем на квадраты 5х5,
+            // проверяем по диагонали (сколько значений подряд, кто игрок, кто противник)
+            if (resultEnemy == null) resultEnemy = map.onTransportation(j).toSquares().checkLines(i, enemy, player)
+            // переворачиваем map на 90 градусов j раз (ищем по горизонтали и вертикали), разбиваем на квадраты 5х5,
+            // проверяем по вертикали и горизонтали (сколько значений подряд, кто игрок, кто противник)
+
+            if (resultEnemy != null) {
+                resultEnemy.forEach {
+                    winningMoveEnemy += "${it.first.first + 1} - ${it.first.second + 1};"
+                    // добавляем точку, в которую можнет сходить противник для выигрыша
+                }
+                break
+            }
+        }
+    }
+
+    val winningMove = mutableListOf<String>()  // выигрышный ход
+    var result: ArrayList<Pair<Pair<Int, Int>, Char>>? = null   // нашлись ходы, куда можно сходить
+    // отсчет от 4 до 0, сколько значений имеется в ряд (если для победы нужно 5, то мы проверяем,
+    // есть ли у нас 4 значения подряд и тд)
+    for (i in (winnerQuality - 1) downTo 0) {
+        if (result != null) break
+        for (j in 0..4) {
+            if (result == null) result = map.onTransportation(j).toSquares().checkDiagonal(i, player, enemy)
+            if (result == null) result = map.onTransportation(j).toSquares().checkLines(i, player, enemy)
+            if (result != null) {
+                result.forEach {
+                    winningMove += "${it.first.first + 1} - ${it.first.second + 1};"
+                    // добавляем точку, в которую можно сходить в выигрышный ход
+                }
+                break
+            }
+        }
+    }
+
+    return if (winningMoveEnemy.isEmpty()) null
+    else winningMove.joinToString(" ")
+}
+
+
+fun createEmptyArray(size: Int): ArrayList<Array<Pair<Pair<Int, Int>, Char>>> { //обнуление
+    val result = ArrayList<Array<Pair<Pair<Int, Int>, Char>>>()
+    for (i in 0 until size) {
+        result.add(Array(size) { Pair(Pair(0, 0), Player.EMPTY.value) })
+        for (j in 0 until size) {
+            result[i][j] = Pair(Pair(i, j), Player.VOID.value)
+        }
+    }
+    return result
+}
+
+fun ArrayList<Array<Pair<Pair<Int, Int>, Char>>>.onTransportation(  // переворачиваем map
+    count: Int
+): ArrayList<Array<Pair<Pair<Int, Int>, Char>>> {
+
+    var result = createEmptyArray(size)  // значение, перенесенное с одной координаты на другую
+    val tmp = ArrayList(this)
+    for (k in 0 until count) {
+        for (i in tmp.indices) {
+            for (j in tmp.indices) {
+                result[j][tmp.size - 1 - i] = tmp[i][j]
+            }
+        }
+        tmp.clear()
+        tmp.addAll(result)
+        result = createEmptyArray(size)
+    }
+    return tmp
+}
+
+
+fun ArrayList<Array<Pair<Pair<Int, Int>, Char>>>.toSquares()   // разбиение на квадраты 5x5
+        : ArrayList<ArrayList<Array<Pair<Pair<Int, Int>, Char>>>> {
+    val block = 5 // размер блока (победный квадрат)
+    val result = ArrayList<ArrayList<Array<Pair<Pair<Int, Int>, Char>>>>() // складываем мини-квадраты
+    var tmpArray: ArrayList<Array<Pair<Pair<Int, Int>, Char>>> // зесь хранятся разные мини-квадраты
+    // генерация мини-квадратов (после точек 1..15 - 10 и 10 - 1..15 разбить на маленькие
+    // квадраты не удастся, так как они буду выходить за границы квадрата 15х15
+    for (k in 0 until size - block) {
+        for (l in 0 until size - block) {
+            tmpArray = createEmptyArray(block)
+            for (i in 0 until block) {
+                for (j in 0 until block) {
+                    tmpArray[i][j] = this[i + k][j + l]
+                }
+            }
+            result.add(tmpArray)
+        }
+    }
+    return result
+}
+
+
+fun ArrayList<ArrayList<Array<Pair<Pair<Int, Int>, Char>>>>.checkDiagonal(  // проверка от верхнего левого угла к верхнему правому
+    checkValueCount: Int,
+    char: Char,
+    enemy: Char
+): ArrayList<Pair<Pair<Int, Int>, Char>>? {
+    var points: ArrayList<Pair<Pair<Int, Int>, Char>>
+    this.forEach { square ->
+        var check = 0 //нужный символ
+        var enemyCount = 0 //противник
+        points = ArrayList()  // точки, в которые можно сходить
+        for (i in square.indices) {
+            if (square[i][i].second == enemy) enemyCount++   // если есть противник
+            if (square[i][i].second == char) check++     // если есть нужный символ
+            if (square[i][i].second == Player.VOID.value) points.add(square[i][i])
+        }
+        if (check == checkValueCount && enemyCount <= 0) return points
+    }
+    return null
+}
+
+fun ArrayList<ArrayList<Array<Pair<Pair<Int, Int>, Char>>>>.checkLines(
+    checkValueCount: Int,
+    char: Char,
+    enemy: Char
+): ArrayList<Pair<Pair<Int, Int>, Char>>? {
+    var points: ArrayList<Pair<Pair<Int, Int>, Char>>
+    this.forEach { square ->
+        for (i in square.indices) {
+            var check = 0
+            var enemyCount = 0
+            points = ArrayList()
+            for (j in square.indices) {
+                if (square[i][j].second == enemy) enemyCount++
+                if (square[i][j].second == char) check++
+                if (square[i][j].second == Player.VOID.value) points.add(square[i][j])
+            }
+
+            if (check == checkValueCount && enemyCount <= 0) {
+                return points
+            }
+        }
+    }
+    return null
+}
