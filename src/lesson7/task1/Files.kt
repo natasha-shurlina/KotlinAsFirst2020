@@ -4,6 +4,7 @@ package lesson7.task1
 
 import kotlinx.html.attributes.stringSetDecode
 import ru.spbstu.kotlin.typeclass.classes.Monoid.Companion.plus
+import ru.spbstu.ktuples.Tuple0.size
 import java.io.File
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -527,7 +528,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 }
 
 
-
 /**Есть файл, в котором схематично изображено поле для игры в крестики-нолики на доске 15х15, а именно:
 - 15 строк
 - в каждой строке строго 15 символов
@@ -543,10 +543,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 Необходимо написать функцию и тесты к ней.
  */
 enum class Player(val value: Char) {
-    X('X'), O('O'), VOID('-'), EMPTY(' ')
+    X('X'), O('O'), VOID('-')
 }
 
-fun main(inputName: String): Any? {
+fun main(inputName: String, move: Char): String? {
+
     val size = 15 // размер квадратного поля
     val winnerQuality = 5 // условие победы
     val map: ArrayList<Array<Pair<Pair<Int, Int>, Char>>> = ArrayList()
@@ -554,7 +555,7 @@ fun main(inputName: String): Any? {
 
     // инициализация map для избежания ошибки NullPointerException
     for (i in 0 until size) {
-        map.add(Array(size) { Pair(Pair(0, 0), Player.EMPTY.value) })
+        map.add(Array(size) { Pair(Pair(0, 0), Player.VOID.value) })
     }
 
     for (i in map.indices) {
@@ -564,18 +565,17 @@ fun main(inputName: String): Any? {
     }
 
 
-    // читаем данные и сохраняем в map
-    var k = 0
-    File(inputName).forEachLine { line ->
-        val values = line.split(' ')
-        for (i in values.indices) {
-            map[k][i] = Pair(Pair(k, i), values[i][0])
-        }
-        k++
+    for ((i, line) in File(inputName).readLines().withIndex()) {
+        for (j in 0 until size)
+            map[i][j] = Pair(Pair(i, j), line[j])
     }
 
-    val player = Player.X.value    // игрок
-    val enemy = Player.O.value     // противник
+    var player = Player.X.value
+    var enemy = Player.O.value
+    if (move == 'O') {
+        enemy = Player.X.value
+        player = Player.O.value
+    }
 
     // проверяем, не победил ли уже противник
     val winningMoveEnemy = mutableListOf<String>()  // выигрышный ход противника
@@ -629,7 +629,7 @@ fun main(inputName: String): Any? {
 fun createEmptyArray(size: Int): ArrayList<Array<Pair<Pair<Int, Int>, Char>>> { //обнуление
     val result = ArrayList<Array<Pair<Pair<Int, Int>, Char>>>()
     for (i in 0 until size) {
-        result.add(Array(size) { Pair(Pair(0, 0), Player.EMPTY.value) })
+        result.add(Array(size) { Pair(Pair(0, 0), Player.VOID.value) })
         for (j in 0 until size) {
             result[i][j] = Pair(Pair(i, j), Player.VOID.value)
         }
@@ -723,3 +723,4 @@ fun ArrayList<ArrayList<Array<Pair<Pair<Int, Int>, Char>>>>.checkLines(
     }
     return null
 }
+

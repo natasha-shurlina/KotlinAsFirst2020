@@ -446,9 +446,10 @@ Basic, Ruby, Swift.
 
     @Test
     fun main() {
-        assertEquals("7 - 10;", main("input/First.txt"))
-        assertEquals(null, main("input/Second.txt"))
-        assertEquals("5 - 11;", main("input/Third.txt"))
+        assertEquals("7 - 10;", main("input/First.txt", 'x'))
+        assertEquals(null, main("input/Second.txt", 'x'))
+        assertEquals("5 - 11;", main("input/Third.txt", 'x'))
+        assertEquals("7 - 7;", main("input/Fourth.txt", 'x'))
     }
 
 }
