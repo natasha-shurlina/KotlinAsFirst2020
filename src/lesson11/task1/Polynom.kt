@@ -2,6 +2,8 @@
 
 package lesson11.task1
 
+import kotlin.math.pow
+
 /**
  * Класс "полином с вещественными коэффициентами".
  *
@@ -21,15 +23,36 @@ package lesson11.task1
  */
 class Polynom(vararg coeffs: Double) {
 
+    constructor(per: MutableList<Double>) : this(*per.toDoubleArray())
+
+    private val listCoeffs = coeffs.toMutableList()
+    private fun removingZeros(coffeesWithoutZeros: MutableList<Double>): MutableList<Double> {
+        if (coffeesWithoutZeros.size == 1 && coffeesWithoutZeros[0] == 0.0) coffeesWithoutZeros
+        else while (coffeesWithoutZeros.size != 0 && coffeesWithoutZeros[0] == 0.0)
+            coffeesWithoutZeros.removeAt(0)
+
+        return coffeesWithoutZeros
+    }
+
+    val size = removingZeros(listCoeffs).size
+    val polinom = removingZeros(listCoeffs)
+
+
     /**
      * Геттер: вернуть значение коэффициента при x^i
      */
-    fun coeff(i: Int): Double = TODO()
+    fun coeff(i: Int): Double = polinom[size - i - 1]
 
     /**
      * Расчёт значения при заданном x
      */
-    fun getValue(x: Double): Double = TODO()
+    fun getValue(x: Double): Double {
+        var result = 0.0
+        for (i in 0 until size) {
+            result += polinom[i] * x.pow(size - 1 - i)
+        }
+        return result
+    }
 
     /**
      * Степень (максимальная степень x при ненулевом слагаемом, например 2 для x^2+x+1).
@@ -38,27 +61,80 @@ class Polynom(vararg coeffs: Double) {
      * Слагаемые с нулевыми коэффициентами игнорировать, т.е.
      * степень 0x^2+0x+2 также равна 0.
      */
-    fun degree(): Int = TODO()
+    fun degree(): Int = size - 1
 
     /**
      * Сложение
      */
-    operator fun plus(other: Polynom): Polynom = TODO()
+    operator fun plus(other: Polynom): Polynom {
+        val result: MutableList<Double> = mutableListOf()
+        val small: MutableList<Double>
+        val big: MutableList<Double>
+        if (size >= other.size) {
+            big = polinom
+            small = other.polinom
+        } else {
+            big = other.polinom
+            small = polinom
+        }
+
+        var n = 0
+        val difference = big.size - small.size
+        for (i in 0 until big.size) {
+            if (difference - i - 1 >= 0) result += big[i]
+            else {
+                result += small[n] + big[i]
+                n++
+            }
+        }
+        return Polynom(result)
+    }
 
     /**
      * Смена знака (при всех слагаемых)
      */
-    operator fun unaryMinus(): Polynom = TODO()
+    operator fun unaryMinus(): Polynom {
+        val result: MutableList<Double> = mutableListOf()
+        for (i in 0 until size)
+            result += polinom[i] * (-1)
+        return Polynom(result)
+    }
 
     /**
      * Вычитание
      */
-    operator fun minus(other: Polynom): Polynom = TODO()
+    operator fun minus(other: Polynom): Polynom {
+
+        val result: MutableList<Double> = mutableListOf()
+        val first: MutableList<Double> = polinom
+        val second: MutableList<Double> = other.polinom
+
+        if (first.size > second.size) {
+            for (i in 0 until first.size - second.size) second.add(0, 0.0)
+        } else for (i in 0 until second.size - first.size) first.add(0, 0.0)
+        for (i in 0 until first.size) result += polinom[i] - other.polinom[i]
+        return Polynom(result)
+    }
 
     /**
      * Умножение
      */
-    operator fun times(other: Polynom): Polynom = TODO()
+    operator fun times(other: Polynom): Polynom {
+        val resultMap = mutableMapOf<Int, Double>()
+        val result: MutableList<Double> = mutableListOf()
+        for ((power1, coefficient1) in polinom.withIndex()) {
+            for ((power2, coefficient2) in other.polinom.withIndex()) {
+                val power = size + other.polinom.size - power1 - power2 - 2
+                val coefficient = coefficient1 * coefficient2
+                resultMap[power] = (resultMap[power] ?: 0.0).plus(coefficient)
+            }
+        }
+        for ((power, coefficient) in resultMap) {
+            result += coefficient
+        }
+        return Polynom(result)
+    }
+
 
     /**
      * Деление
@@ -68,7 +144,35 @@ class Polynom(vararg coeffs: Double) {
      *
      * Если A / B = C и A % B = D, то A = B * C + D и степень D меньше степени B
      */
-    operator fun div(other: Polynom): Polynom = TODO()
+    operator fun div(other: Polynom): Polynom {
+
+        return when {
+            polinom.size < other.polinom.size -> Polynom(0.0)
+            other.polinom.size == size -> return when {
+                polinom[0] < other.polinom[0] -> Polynom(0.0)
+                else -> Polynom(polinom[0] / other.polinom[0])
+            }
+            else -> {
+                val result: MutableList<Double> = mutableListOf()
+                val perem: MutableList<Double> = mutableListOf()
+                perem += polinom[0]
+                var count = size
+                var ex = polinom
+                while (count >= other.size) {
+                    val res = perem[0] / other.polinom[0]
+                    result += res
+                    perem.clear()
+                    for (i in 0 until other.size) {
+                        perem += ex[i] - (other.polinom[i] * res)
+                        if (perem[0] == 0.0) perem.removeAt(0)
+                    }
+                    ex = perem
+                    count = perem.size
+                }
+                return Polynom(result)
+            }
+        }
+    }
 
     /**
      * Взятие остатка
@@ -78,10 +182,11 @@ class Polynom(vararg coeffs: Double) {
     /**
      * Сравнение на равенство
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean = other is Polynom && polinom == other.polinom
+
 
     /**
      * Получение хеш-кода
      */
-    override fun hashCode(): Int = TODO()
+    override fun hashCode(): Int = polinom.hashCode()
 }
